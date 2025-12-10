@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>System Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <h1>System Dashboard</h1>
+    </header>
+
+    <main>
+        <section class="metrics">
+            <div class="metric">
+                <h3>CPU Usage (%)</h3>
+                <canvas id="cpuChart"></canvas>
+            </div>
+            <div class="metric">
+                <h3>RAM Usage (%)</h3>
+                <canvas id="ramChart"></canvas>
+            </div>
+            <div class="metric">
+                <h3>Disk Usage (%)</h3>
+                <canvas id="diskChart"></canvas>
+            </div>
+            <div class="metric">
+                <h3>GPU Usage (%)</h3>
+                <canvas id="gpuChart"></canvas>
+            </div>
+        </section>
+        <section class="network">
+            <h3>Network (Bytes)</h3>
+            <p>Sent: <span id="netSent">0</span></p>
+            <p>Received: <span id="netRecv">0</span></p>
+        </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='/main.js') }}"></script>
+</body>
+</html>
