@@ -1,5 +1,6 @@
+// =====================
 // Global Chart Variables
-
+// =====================
 let charts = {
     cpu: null,
     ram: null,
@@ -8,6 +9,14 @@ let charts = {
     battery: null
 };
 
+// Cache frequently used DOM elements
+const batteryStatusEl = document.getElementById('batteryStatus');
+const netSentEl = document.getElementById('netSent');
+const netRecvEl = document.getElementById('netRecv');
+
+// =====================
+// Initialize Charts
+// =====================
 function initCharts() {
     // CPU (Bar chart per core)
     const cpuCtx = document.getElementById('cpuChart').getContext('2d');
@@ -22,7 +31,17 @@ function initCharts() {
     charts.ram = new Chart(ramCtx, {
         type: 'doughnut',
         data: { labels: ['Used', 'Free'], datasets: [{ data: [0, 100], backgroundColor: ['#ff6384', '#36a2eb'] }] },
-        options: { responsive: true }
+        options: {
+            responsive: true,
+            plugins: {
+                datalabels: {
+                    color: '#fff',
+                    formatter: (value, context) => context.dataIndex === 0 ? value + '%' : '',
+                    font: { weight: 'bold', size: 16 }
+                }
+            }
+        },
+        plugins: [ChartDataLabels]
     });
 
     // Disk (Doughnut)
@@ -30,7 +49,17 @@ function initCharts() {
     charts.disk = new Chart(diskCtx, {
         type: 'doughnut',
         data: { labels: ['Used', 'Free'], datasets: [{ data: [0, 100], backgroundColor: ['#ff9f40', '#4bc0c0'] }] },
-        options: { responsive: true }
+        options: {
+            responsive: true,
+            plugins: {
+                datalabels: {
+                    color: '#fff',
+                    formatter: (value, context) => context.dataIndex === 0 ? value + '%' : '',
+                    font: { weight: 'bold', size: 16 }
+                }
+            }
+        },
+        plugins: [ChartDataLabels]
     });
 
     // GPU (Bar chart)
@@ -46,7 +75,17 @@ function initCharts() {
     charts.battery = new Chart(batteryCtx, {
         type: 'doughnut',
         data: { labels: ['Used', 'Remaining'], datasets: [{ data: [0, 100], backgroundColor: ['#ff6384', '#36a2eb'] }] },
-        options: { responsive: true }
+        options: {
+            responsive: true,
+            plugins: {
+                datalabels: {
+                    color: '#fff',
+                    formatter: (value, context) => context.dataIndex === 1 ? value + '%' : '',
+                    font: { weight: 'bold', size: 16 }
+                }
+            }
+        },
+        plugins: [ChartDataLabels]
     });
 }
 
@@ -82,7 +121,6 @@ async function updateMetrics() {
         charts.gpu.update();
 
         // --- Battery ---
-        const batteryStatusEl = document.getElementById('batteryStatus');
         if (data.battery) {
             charts.battery.data.datasets[0].data = [100 - data.battery.percent, data.battery.percent];
             charts.battery.update();
@@ -102,14 +140,17 @@ async function updateMetrics() {
         }
 
         // --- Network ---
-        document.getElementById('netSent').innerText = data.network.sent;
-        document.getElementById('netRecv').innerText = data.network.recv;
+        netSentEl.innerText = data.network.sent;
+        netRecvEl.innerText = data.network.recv;
 
     } catch (err) {
         console.error("Failed to fetch system metrics:", err);
     }
 }
 
+// =====================
+// Initialize Dashboard
+// =====================
 function initDashboard() {
     initCharts();
     updateMetrics();
