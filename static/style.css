@@ -38,6 +38,13 @@ main {
     text-align: center;
 }
 
+.metric p#batteryStatus {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 1rem;
+    margin-top: 8px;
+}
+
+
 .network {
     background: #2b2b2b;
     padding: 20px;

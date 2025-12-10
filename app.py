@@ -19,13 +19,26 @@ def system_metrics():
     gpus = GPUtil.getGPUs()
     gpu_data = [{"name": g.name, "load": g.load*100, "memoryUsed": g.memoryUsed, "memoryTotal": g.memoryTotal} for g in gpus]
 
+    # Battery info
+    battery = psutil.sensors_battery()
+    if battery:
+        battery_data = {
+            "percent": battery.percent,
+            "charging": battery.power_plugged,
+            "secsleft": battery.secsleft
+        }
+    else:
+        battery_data = None  # Device has no battery
+
     return jsonify({
         "cpu": cpu,
         "ram": ram,
         "disk": disk,
         "network": {"sent": net.bytes_sent, "recv": net.bytes_recv},
-        "gpu": gpu_data
+        "gpu": gpu_data,
+        "battery": battery_data
     })
+
 
 if __name__ == "__main__":
     app.run(debug=True)
