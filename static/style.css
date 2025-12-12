@@ -1,73 +1,46 @@
-/*  Root Theme Colours  */
-:root {
-    --bg-main: #1f1f1f;
-    --bg-header: #111;
-    --bg-card: #2b2b2b;
-    --text-light: #ffffff;
-    --radius: 12px;
-    --shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-}
-
-/*  Base Styles  */
 body {
     font-family: Arial, sans-serif;
+    background: #1d1d1d;
+    color: #fff;
     margin: 0;
-    background: var(--bg-main);
-    color: var(--text-light);
+    padding: 0;
 }
 
 header {
-    background: var(--bg-header);
+    background: #111;
     padding: 20px;
     text-align: center;
 }
 
-h1 {
-    margin: 0;
-}
-
-/*  Layout  */
-main {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+.grid {
+    display: grid;
+    gap: 20px;
     padding: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 }
 
-.metrics {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 30px;
-    margin-bottom: 30px;
-}
-
-/* Metric Cards */
-.metric {
-    background: var(--bg-card);
+.card {
+    background: #2a2a2a;
     padding: 20px;
-    border-radius: var(--radius);
-    width: 100%;
-    max-width: 300px;
-    text-align: center;
-    box-shadow: var(--shadow);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    border-radius: 10px;
 }
 
-.metric:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+.status-box {
+    width: 15px;
+    height: 15px;
+    border-radius: 5px;
+    display: inline-block;
+    margin-bottom: 10px;
 }
 
-/* 
-   Network Panel
-*/
-.network {
-    background: var(--bg-card);
-    padding: 20px;
-    border-radius: var(--radius);
-    width: 100%;
-    max-width: 650px;
-    text-align: center;
-    box-shadow: var(--shadow);
+.status-green {
+    background: #3ac95c;
+}
+
+.status-amber {
+    background: #e6c119;
+}
+
+.status-red {
+    background: #e63838;
 }

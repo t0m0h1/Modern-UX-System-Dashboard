@@ -4,47 +4,68 @@
     <meta charset="UTF-8">
     <title>System Dashboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='/style.css') }}">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
     <header>
         <h1>System Dashboard</h1>
+        <p id="systemInfo"></p>
     </header>
 
-    <main>
-        <section class="metrics">
-            <div class="metric">
-                <h3>CPU Usage (%)</h3>
-                <canvas id="cpuChart"></canvas>
-            </div>
-            <div class="metric">
-                <h3>RAM Usage (%)</h3>
-                <canvas id="ramChart"></canvas>
-            </div>
-            <div class="metric">
-                <h3>Disk Usage (%)</h3>
-                <canvas id="diskChart"></canvas>
-            </div>
-            <div class="metric">
-                <h3>GPU Usage (%)</h3>
-                <canvas id="gpuChart"></canvas>
-            </div>
-            <div class="metric">
-                <h3>Battery</h3>
-                <canvas id="batteryChart"></canvas>
-                <p id="batteryStatus"></p>
-            </div>            
-        </section>
-        <section class="network">
-            <h3>Network (Bytes)</h3>
-            <p>Sent: <span id="netSent">0</span></p>
-            <p>Received: <span id="netRecv">0</span></p>
-        </section>
+    <main class="grid">
+
+        <!-- CPU -->
+        <div class="card">
+            <h3 id="cpuTitle">CPU Usage</h3>
+            <div class="status-box" id="cpuStatus"></div>
+            <canvas id="cpuChart"></canvas>
+            <p>CPU Temp: <span id="cpuTemp">N/A</span> °C</p>
+        </div>
+
+        <!-- RAM -->
+        <div class="card">
+            <h3 id="ramTitle">RAM Usage</h3>
+            <div class="status-box" id="ramStatus"></div>
+            <canvas id="ramChart"></canvas>
+        </div>
+
+        <!-- Disk -->
+        <div class="card">
+            <h3 id="diskTitle">Disk Usage</h3>
+            <div class="status-box" id="diskStatus"></div>
+            <canvas id="diskChart"></canvas>
+        </div>
+
+        <!-- GPU -->
+        <div class="card">
+            <h3 id="gpuTitle">GPU Load</h3>
+            <div class="status-box" id="gpuStatus"></div>
+            <canvas id="gpuChart"></canvas>
+            <p>GPU Temp: <span id="gpuTemp">N/A</span> °C</p>
+            <p>VRAM: <span id="gpuVram">N/A</span></p>
+        </div>
+
+        <!-- Battery -->
+        <div class="card">
+            <h3 id="batteryTitle">Battery</h3>
+            <div class="status-box" id="batteryStatusBox"></div>
+            <canvas id="batteryChart"></canvas>
+            <p id="batteryStatus"></p>
+        </div>
+
+        <!-- Network -->
+        <div class="card">
+            <h3>Network</h3>
+            <p>Upload: <span id="uploadSpeed">0 KB/s</span></p>
+            <p>Download: <span id="downloadSpeed">0 KB/s</span></p>
+            <canvas id="netChart"></canvas>
+        </div>
+
     </main>
 
-    <script src="{{ url_for('static', filename='/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
 </body>
 </html>
