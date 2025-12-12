@@ -1,6 +1,9 @@
 from flask import Flask, jsonify, render_template
-import psutil, platform, time
+import psutil
+import platform
+import time
 import GPUtil
+import subprocess
 
 app = Flask(__name__)
 
@@ -20,59 +23,103 @@ def index():
 def system_metrics():
     global last_net
 
-    # CPU
+    # ---------- CPU ----------
     cpu_per_core = psutil.cpu_percent(percpu=True)
-    cpu_temp = 0
+
+    # CPU temperature
+    cpu_temp = None
     try:
         temps = psutil.sensors_temperatures()
-        if "coretemp" in temps:
-            cpu_temp = temps["coretemp"][0].current
-    except:
+        if temps:
+            # Try common CPU sensor keys in order
+            for key in ("coretemp", "k10temp", "acpitz"):
+                if key in temps and temps[key]:
+                    cpu_temp = temps[key][0].current
+                    break
+        # macOS fallback using osx-cpu-temp
+        if cpu_temp is None and platform.system() == "Darwin":
+            try:
+                output = subprocess.check_output(["osx-cpu-temp"])
+                cpu_temp = output.decode().strip()
+            except Exception:
+                cpu_temp = None
+    except Exception:
         cpu_temp = None
 
-    # RAM
+
+    # ---------- RAM ----------
     ram = psutil.virtual_memory().percent
 
-    # Disk
+    # ---------- Disk ----------
     disk = psutil.disk_usage("/").percent
 
-    # Network Bytes + Speeds
+    # ---------- Network ----------
     net = psutil.net_io_counters()
     current_time = time.time()
     time_diff = current_time - last_net["time"]
-
     upload_speed = (net.bytes_sent - last_net["sent"]) / max(time_diff, 0.001)
     download_speed = (net.bytes_recv - last_net["recv"]) / max(time_diff, 0.001)
-
     last_net = {"sent": net.bytes_sent, "recv": net.bytes_recv, "time": current_time}
 
-    # GPU
-    gpus = GPUtil.getGPUs()
+    # ---------- GPU ----------
     gpu_data = []
-    for g in gpus:
-        gpu_data.append({
-            "name": g.name,
-            "load": g.load * 100,
-            "temp": g.temperature,
-            "vram_used": g.memoryUsed,
-            "vram_total": g.memoryTotal
-        })
 
-    # Battery
+    if platform.system() == "Darwin":  # Apple Silicon
+        try:
+            # Get GPU name & VRAM
+            output = subprocess.check_output(["system_profiler", "SPDisplaysDataType"])
+            output = output.decode()
+            name_match = re.search(r"Chipset Model: (.+)", output)
+            vram_match = re.search(r"VRAM \(Total\): (.+)", output)
+            gpu_info = {
+                "name": name_match.group(1) if name_match else "Apple GPU",
+                "vram": vram_match.group(1) if vram_match else "Unknown",
+                "load": None,
+                "vram_used": None,
+                "temp": None
+            }
+
+            # Optional GPU temperature using osx-cpu-temp if installed
+            try:
+                temp_output = subprocess.check_output(["osx-cpu-temp"])
+                temp_str = temp_output.decode().strip()
+                gpu_info["temp"] = temp_str
+            except Exception:
+                gpu_info["temp"] = None
+
+            gpu_data.append(gpu_info)
+        except Exception:
+            gpu_data.append({
+                "name": "Apple GPU",
+                "vram": "Unknown",
+                "load": None,
+                "vram_used": None,
+                "temp": None
+            })
+    else:  # Windows/Linux with NVIDIA/AMD
+        gpus = GPUtil.getGPUs()
+        for g in gpus:
+            gpu_data.append({
+                "name": g.name,
+                "load": g.load * 100,
+                "temp": g.temperature,
+                "vram_used": g.memoryUsed,
+                "vram_total": g.memoryTotal
+            })
+
+    # ---------- Battery ----------
     battery = psutil.sensors_battery()
+    battery_data = None
     if battery:
         battery_data = {
             "percent": battery.percent,
             "charging": battery.power_plugged,
             "secsleft": battery.secsleft
         }
-    else:
-        battery_data = None
 
-    # System Info
+    # ---------- System Info ----------
     boot_time = psutil.boot_time()
     uptime = int(time.time() - boot_time)
-
     sysinfo = {
         "os": platform.system(),
         "os_version": platform.version(),
